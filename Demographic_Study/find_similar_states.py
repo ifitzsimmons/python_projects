@@ -1,8 +1,9 @@
 import argparse
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pprint import pprint
 import sys
+import unittest
 
 def _parse_args():
     parser = argparse.ArgumentParser(
@@ -46,6 +47,26 @@ def filter_by_race(df):
     
     return races_df
 
+def get_cos_sim(array_1, array_2):
+    """Calculate cosine similarity of two numpy arrays
+    
+    Parameters
+    ----------
+    array_1, array_2: np.array
+
+    Returns
+    -------
+    cos_sim: float
+        cosine similarity of two arrays
+
+    """
+    cos_sim = array_1.dot(array_2) / (np.linalg.norm(array_1) * np.linalg.norm(array_2))
+
+    if np.isnan(cos_sim):
+        cos_sim = 0.0
+
+    return cos_sim
+
 def get_state_similarities(dem_df):
     """Find similarity of race distribution between states
     
@@ -79,7 +100,7 @@ def get_state_similarities(dem_df):
                 comp_array = np.array(comp_dem)
 
                 # cosine similarity = (dot product of two arrays)/(product of their magnitudes)
-                cos_sim = dem_array.dot(comp_array) / (np.linalg.norm(dem_array) * np.linalg.norm(comp_array))
+                cos_sim = get_cos_sim(dem_array, comp_array)
                 demographic_similarities.append((location_1, comp_location, cos_sim))
 
     sorted_sim = sorted(demographic_similarities, key=lambda x: x[2], reverse=True)
@@ -110,10 +131,12 @@ def get_sim_info(similarities, top):
     least_similar = [(item[0], item[1]) for item in reversed(similarities[-top:])]
     return most_similar, least_similar
 
+
 if __name__ == "__main__":
     top_results = _parse_args().parse_args().top_results
     path = 'data/demographics.csv'
 
+    get_sim_info
     data = pd.read_csv(path)
     data = data.set_index('Location')
     data['total'] = data['Male'] + data['Female']
