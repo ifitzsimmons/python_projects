@@ -1,22 +1,24 @@
-import unittest
+import pytest
 import numpy as np
 import pandas as pd
 import find_similar_states as fss
 
 def test_filter_by_race():
     test_frame = pd.DataFrame({
-        'White': [], 'Black': [], 'Hispanic': [], 'Asian': [], 
-        'American_Indian_or_Alaska_Native': [], 
-        'Native_Hawaiian_or_Other_Pacific_Islander': [], 
-        'Two_Or_More_Races': [], 'male':[],
-        'female': []
+        'White': [1, 2, 3, 4], 'Black': [5, 6, 7, 8], 'Hispanic': [9, 10, 11, 12], 
+        'Asian': [12, 11, 10, 9], 
+        'American_Indian_or_Alaska_Native': [8, 7, 6, 5], 
+        'Native_Hawaiian_or_Other_Pacific_Islander': [4, 3, 2, 1], 
+        'Two_Or_More_Races': [1, 3, 5, 7], 'male':[2, 4, 6, 8],
+        'female': [11, 13, 17, 19]
     })
 
     expected = pd.DataFrame({
-        'White': [], 'Black': [], 'Hispanic': [], 'Asian': [], 
-        'American_Indian_or_Alaska_Native': [], 
-        'Native_Hawaiian_or_Other_Pacific_Islander': [], 
-        'Two_Or_More_Races': [],
+        'White': [1, 2, 3, 4], 'Black': [5, 6, 7, 8], 'Hispanic': [9, 10, 11, 12], 
+        'Asian': [12, 11, 10, 9], 
+        'American_Indian_or_Alaska_Native': [8, 7, 6, 5], 
+        'Native_Hawaiian_or_Other_Pacific_Islander': [4, 3, 2, 1], 
+        'Two_Or_More_Races': [1, 3, 5, 7],
     })
 
     result = fss.filter_by_race(test_frame)
@@ -28,17 +30,17 @@ def test_cos_sim():
 
     expected = 1.0/3
     result = fss.get_cos_sim(array_1, array_2)
-    assert result == expected
+    assert result == pytest.approx(expected)
 
 def test_get_state_similarities():
     test_frame = pd.DataFrame({
-        'White': [1,1,10,4], 'Black': [1,1,20,4], 'Hispanic': [0,0,50,1]
+        'White': [1, 1, 10, 4], 'Black': [1, 1, 20, 4], 'Hispanic': [0, 0, 50, 1]
     })
-    indeces = ['A', 'B', 'C', 'D']
-    test_frame.index = indeces
+    indices = ['A', 'B', 'C', 'D']
+    test_frame.index = indices
     
     array_dict = {}
-    for idx in indeces:
+    for idx in indices:
         array_dict[idx] = np.array(test_frame.loc[idx])
 
     expected = [
@@ -53,8 +55,25 @@ def test_get_state_similarities():
     result = fss.get_state_similarities(test_frame)
     assert result == expected
 
-if __name__ == '__main__':
-    test_filter_by_race()
-    test_cos_sim()
-    test_get_state_similarities()
+
+def test_get_sim_info():
+    test = [
+        ('A', 'B', 1),
+        ('A', 'D', .5),
+        ('A', 'C', .25)
+    ]
+
+    most_expected = [
+        ('A', 'B'),
+        ('A', 'D')
+    ]
+
+    least_expected = [
+        ('A', 'C'),
+        ('A', 'D')
+    ]
+
+    most, least = fss.get_sim_info(test, 2)
+    assert most_expected == most
+    assert least_expected == least
 

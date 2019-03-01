@@ -12,7 +12,6 @@ def _parse_args():
                      'based on the distribution of races.'))
 
     parser.add_argument('--top-results', type=int, default=5,
-
                         help='Number of results displayed')
 
     return parser
@@ -52,7 +51,8 @@ def get_cos_sim(array_1, array_2):
     
     Parameters
     ----------
-    array_1, array_2: np.array
+        array_1:  np.ndarray, shape [n_locations, m_races_considered]
+        array_2:  np.ndarray, shape [n_locations, m_races_considered]
 
     Returns
     -------
@@ -79,7 +79,7 @@ def get_state_similarities(dem_df):
     Returns
     -------
     sorted_sim: list
-        Sorted list of tuples containing Location 1, Location 2, and 
+        sorted list of tuples containing Location 1, Location 2, and 
         their cosine similarity of the population distribution. Sorted 
         from most similar to least similar
 
@@ -105,14 +105,14 @@ def get_state_similarities(dem_df):
 
     sorted_sim = sorted(demographic_similarities, key=lambda x: x[2], reverse=True)
     return sorted_sim
-    
-def get_sim_info(similarities, top):
+
+def get_sim_info(similarities, top=5):
     """Find most and least common states by race distribution
     
     Parameters
     ----------
     similarities: list
-        List containing two states and their similarity sorted
+        Reverse sorted List containing two states and their similarity sorted
         by similarity from most to least similar
     top: int
         Number of results returned. 
@@ -134,9 +134,8 @@ def get_sim_info(similarities, top):
 
 if __name__ == "__main__":
     top_results = _parse_args().parse_args().top_results
-    path = 'data/demographics.csv'
 
-    get_sim_info
+    path = 'data/demographics.csv'
     data = pd.read_csv(path)
     data = data.set_index('Location')
     data['total'] = data['Male'] + data['Female']
