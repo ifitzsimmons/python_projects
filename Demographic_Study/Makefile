@@ -4,4 +4,4 @@ test:
 	python -m pytest tests
 
 image:
-	docker build -t 'demographic_data':<verison-tag> .
+	docker build -t 'demographic_data':$(git describe --tags)
